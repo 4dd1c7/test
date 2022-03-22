@@ -1,0 +1,47 @@
+- name: define resource group
+    azure_rm_resourcegroup:
+    name: BD07_groep2
+    location: westeu
+
+- name: create virtual network
+    azure_rm_virtualnetwork:
+    resource_group: BD07_groep2
+    name: vnet_test
+    
+- name: Add subnet
+    azure_rm_subnet:
+    resource_group: BD07_groep2
+    name: snet_test
+    address_prefix: "10.0.1.0/24"
+    virtual_network: vnet_test
+    
+- name: Create Network Security Group
+    azure_rm_securitygroup:
+    resource_group: BD07_groep2
+    name: nsg_test
+   
+- name: Create a network interface
+    azure_rm_networkinterface:
+    name: nic-test
+    resource_group: BD07_groep2
+    virtual_network: vnet-test
+    subnet_name: snet-test
+    security_group: nsg-test
+    ip_configurations:
+        - name: default
+        primary: True
+
+- name: Create VM
+    azure_rm_virtualmachine:
+    resource_group: BD07_groep2
+    name: vm-cs-web01
+    vm_size: Standard_DS1_v2
+    admin_username: test
+    admin_password: "{{ password }}"
+    network_interfaces: nic-test
+    os_type: Windows
+    image:
+        offer: WindowsServer
+        publisher: MicrosoftWindowsServer
+        sku: 2019-Datacenter
+        version: latest
